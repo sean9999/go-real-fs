@@ -62,7 +62,7 @@ func (rfs realFS) ReadFile(name string) ([]byte, error) {
 	return rfs.dirFs.(fs.ReadFileFS).ReadFile(newName)
 }
 
-func NewRealFS() RealFS {
+func New() RealFS {
 	rfs := realFS{}
 	rfs.dirFs = os.DirFS("/")
 	return rfs
