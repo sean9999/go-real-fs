@@ -13,19 +13,21 @@ type RealFS interface {
 	fs.ReadDirFS
 }
 
-// realFS implements RealFS
 type realFS struct {
 	dirFs fs.FS
 }
 
+// realFS implements RealFS
+var _ RealFS = (*realFS)(nil)
+
 // since an fs.FS expects file paths that don't work in the real world
 // we transform to root-relative
-// ex:	~/.bashrc	becomes	home/randall/.bashrc
+// ex:	~/.bashrc	becomes	home/henry/.bashrc
 // ex:	/etc/passwd	becomes	etc/passwd
 func (rfs realFS) correctPath(relativePath string) (string, error) {
 	fullPath, err := filepath.Abs(relativePath)
 	if err != nil {
-		return relativePath, err
+		return fullPath, err
 	}
 	return filepath.Rel("/", fullPath)
 }
@@ -63,7 +65,7 @@ func (rfs realFS) ReadFile(name string) ([]byte, error) {
 }
 
 func New() RealFS {
-	rfs := realFS{}
-	rfs.dirFs = os.DirFS("/")
-	return rfs
+	return realFS{
+		dirFs: os.DirFS("/"),
+	}
 }

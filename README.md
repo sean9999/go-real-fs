@@ -2,7 +2,7 @@
 
 A real filesystem that behaves normally and implements [fs.FS](https://pkg.go.dev/io/fs#FS) and wraps [os.DirFS](https://pkg.go.dev/os#DirFS).
 
-Using `fs.FS` to represent filesystems has many advantages, but it can be clunky to work with for reasons [outlined in this wrongly rejected proposal](https://github.com/golang/go/issues/47803).
+Using `fs.FS` to represent filesystems has many advantages, but it can be clunky to work with for reasons [outlined in this rejected proposal](https://github.com/golang/go/issues/47803).
 
 go-real-fs implements this behaviour like so:
 
