@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 )
 
 // WritableFs is a writable filesystem
@@ -42,19 +43,25 @@ func (wfs writableFs) OpenFile(incorrectPath string, flag int, mode fs.FileMode)
 }
 
 func (wfs writableFs) WriteFile(incorrectPath string, data []byte, perm fs.FileMode) error {
-	path, err := wfs.correctPath(incorrectPath)
+	// path, err := wfs.correctPath(incorrectPath)
+	// if err != nil {
+	// 	return err
+	// }
+
+	fullPath, err := filepath.Abs(incorrectPath)
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, perm)
+
+	return os.WriteFile(fullPath, data, perm)
 }
 
 func (wfs writableFs) Remove(incorrectPath string) error {
-	path, err := wfs.correctPath(incorrectPath)
-	if err != nil {
-		return err
-	}
-	return os.Remove(path)
+	// path, err := wfs.correctPath(incorrectPath)
+	// if err != nil {
+	// 	return err
+	// }
+	return os.Remove(incorrectPath)
 }
 
 func NewWritable() writableFs {
