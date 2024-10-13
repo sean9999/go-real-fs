@@ -14,6 +14,8 @@ type finfo struct {
 	f     *TestFSFile
 }
 
+var _ WritableFile = (*TestFSFile)(nil)
+
 var _ fs.File = (*TestFSFile)(nil)
 
 type TestFSFile struct {
@@ -21,6 +23,17 @@ type TestFSFile struct {
 	name   string
 	Info   *finfo
 	cursor int64
+}
+
+func (f *TestFSFile) Write(b []byte) (int, error) {
+	bytesWritten := copy(f.Data[f.cursor:], b)
+	f.cursor += int64(bytesWritten)
+	var err error
+	if f.cursor == int64(len(f.Data)-1) {
+		err = io.EOF
+	}
+	return bytesWritten, err
+
 }
 
 func (f *TestFSFile) IsDir() bool {
