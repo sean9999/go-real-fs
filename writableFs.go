@@ -24,6 +24,8 @@ var _ WritableFs = (*writableFs)(nil)
 type WritableFile interface {
 	fs.File
 	io.Writer
+	io.Seeker
+	Name() string
 }
 
 type writableFile struct {

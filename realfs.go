@@ -26,10 +26,11 @@ var _ RealFS = (*realFS)(nil)
 // ex:	/etc/passwd	becomes	etc/passwd
 func (rfs realFS) correctPath(relativePath string) (string, error) {
 	fullPath, err := filepath.Abs(relativePath)
-	if err != nil {
-		return fullPath, err
-	}
-	return filepath.Rel("/", fullPath)
+	// if err != nil {
+	// 	return fullPath, err
+	// }
+	// return filepath.Rel("/", fullPath)
+	return fullPath, err
 }
 
 func (rfs realFS) Open(name string) (fs.File, error) {
