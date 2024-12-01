@@ -36,6 +36,16 @@ func (f *TestFSFile) Write(b []byte) (int, error) {
 
 }
 
+func (f *TestFSFile) Truncate(n int64) error {
+
+	i := int(n)
+	if i > len(f.Data) {
+		return io.ErrUnexpectedEOF
+	}
+	f.Data = f.Data[:i]
+	return nil
+}
+
 func (f *TestFSFile) IsDir() bool {
 	//	yes if the last char is "/"
 	reg := regexp.MustCompile("\\/$")
