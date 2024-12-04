@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// RealFS mimics [os.DirFS]
+// RealFS is real filesystem that wraps [os.DirFS] and implements [fs.FS]
 type RealFS interface {
 	fs.StatFS
 	fs.ReadFileFS

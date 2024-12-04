@@ -36,3 +36,46 @@ func (rfs realFS) correctPath(relativePath string) (string, error) {
 
 }
 ```
+
+It's power comes from the fact that it satisfies interfaces from the fs package, allowing for modularity and testability. Let's say you wanted to create a storage-agnostic and testable key-value store: 
+
+```go
+
+type Database struct {
+    filesystem realfs.WritableFs
+}
+
+func (d *Database) Get(name string) ([]byte, error) {
+    return d.filesystem.OpenFile(name)
+}
+
+func (d *Databse) Set(name string, content []byte) error {
+    return d.filesystem.WriteFile(name, content, 0640)
+}
+
+func (d *Database) Delete(name string) error {
+    return d.filesystem.Remove(name)
+}
+
+```
+
+To instantiate a real Databse you can do:
+
+```go
+
+db := Database{realfs.NewWritable()} 
+
+```
+
+And to test is equally easy:
+
+```go
+
+func TestDatabase(t *testing.T) {
+
+    
+
+
+}
+
+```
