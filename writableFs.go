@@ -1,6 +1,7 @@
 package realfs
 
 import (
+	"errors"
 	"io"
 	"io/fs"
 	"os"
@@ -24,14 +25,25 @@ var _ WritableFs = (*writableFs)(nil)
 type WritableFile interface {
 	fs.File
 	io.Writer
+	io.Seeker
+	Name() string
+	Truncate(int64) error
 }
 
 type writableFile struct {
 	*os.File
 }
 
+func (wf writableFile) Truncate(i int64) error {
+	return wf.File.Truncate(i)
+}
+
+func (wfs writableFs) CreateFile(name string, data []byte) error {
+	return errors.New("not implemented")
+}
+
 func (wfs writableFs) OpenFile(incorrectPath string, flag int, mode fs.FileMode) (WritableFile, error) {
-	path, err := wfs.correctPath(incorrectPath)
+	path, err := wfs.correctPath(incorrectPath, true)
 	if err != nil {
 		return nil, err
 	}

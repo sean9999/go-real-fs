@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // RealFS is real filesystem that wraps [os.DirFS] and implements [fs.FS]
@@ -24,16 +25,38 @@ var _ RealFS = (*realFS)(nil)
 // we transform to root-relative
 // ex:	~/.bashrc	becomes	home/henry/.bashrc
 // ex:	/etc/passwd	becomes	etc/passwd
-func (rfs realFS) correctPath(relativePath string) (string, error) {
+func (rfs realFS) correctPath(relativePath string, startingSlash bool) (string, error) {
 	fullPath, err := filepath.Abs(relativePath)
 	if err != nil {
 		return fullPath, err
 	}
-	return filepath.Rel("/", fullPath)
+
+	goodPath, err := filepath.Rel("/", fullPath)
+	if err != nil {
+		return fullPath, err
+	}
+
+	if startingSlash {
+		//	add slash
+		if strings.Split(goodPath, "")[0] != "/" {
+			//goodPath = fmt.Sprintf("/%s", goodPath)
+			goodPath = filepath.Join("/", goodPath)
+		}
+	} else {
+		//	remove slash
+		if strings.Split(goodPath, "")[0] == "/" {
+			goodPath = strings.Join(strings.Split(goodPath, "")[1:], "")
+		}
+	}
+
+	return goodPath, nil
+
+	//return filepath.Rel("/", fullPath)
+	//return fullPath, err
 }
 
 func (rfs realFS) Open(name string) (fs.File, error) {
-	newName, err := rfs.correctPath(name)
+	newName, err := rfs.correctPath(name, false)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +64,7 @@ func (rfs realFS) Open(name string) (fs.File, error) {
 }
 
 func (rfs realFS) Stat(name string) (fs.FileInfo, error) {
-	newName, err := rfs.correctPath(name)
+	newName, err := rfs.correctPath(name, false)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +72,7 @@ func (rfs realFS) Stat(name string) (fs.FileInfo, error) {
 }
 
 func (rfs realFS) ReadDir(name string) ([]fs.DirEntry, error) {
-	newName, err := rfs.correctPath(name)
+	newName, err := rfs.correctPath(name, false)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +80,7 @@ func (rfs realFS) ReadDir(name string) ([]fs.DirEntry, error) {
 }
 
 func (rfs realFS) ReadFile(name string) ([]byte, error) {
-	newName, err := rfs.correctPath(name)
+	newName, err := rfs.correctPath(name, false)
 	if err != nil {
 		return nil, err
 	}
